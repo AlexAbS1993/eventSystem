@@ -11,6 +11,7 @@ export interface IEvent {
     subscribers: IWithEvents[]
     subscribe(entitie: IWithEvents): void
     unsub(id: string): void
+    initiate<DT>(data: DT): void
 }
 
 export interface IWithEvents {

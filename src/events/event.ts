@@ -26,6 +26,10 @@ export class Event implements IEvent {
         this.subscribers = this.subscribers.filter(sub => sub.id !== id)
         return
     }
+    initiate<DT>(data: DT): void {
+        this.subscribers.forEach(sub => sub.handle(this.tag, data))
+        return
+    }
     private isIwithEvents(entitie: any) {
         if (entitie.eventSystem && entitie.handle && entitie.id && entitie.initiate) {
             return true

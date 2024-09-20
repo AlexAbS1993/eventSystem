@@ -1,8 +1,30 @@
-import { IWithEvents } from '../src/events/types';
+import { IEventSystem, IWithEvents } from '../src/events/types';
 import { IEvent, Event } from './../src';
-import { beforeEach, describe, test, expect } from '@jest/globals';
+import { beforeEach, describe, test, expect, jest } from '@jest/globals';
 
 const mockTag = 'test_run'
+let mockSubscriber: IWithEvents = {
+    id: '1',
+    eventSystem: {} as IEventSystem,
+    initiate: function <DT>(tag: string, data: DT): void {
+        throw new Error('Function not implemented.');
+    },
+    handle: jest.fn((tag: string, data: any) => {
+        let { user } = data
+        return user + ' declined'
+    })
+}
+let mockSubscriber2: IWithEvents = {
+    id: '2',
+    eventSystem: {} as IEventSystem,
+    initiate: function <DT>(tag: string, data: DT): void {
+        throw new Error('Function not implemented.');
+    },
+    handle: jest.fn((tag: string, data: any) => {
+        let { status } = data
+        return status + ' accepted'
+    })
+}
 describe("Сущность IEvent представляет собой объект с методами для одного эвента", () => {
     let event: IEvent
     beforeEach(() => {
@@ -35,5 +57,17 @@ describe("Сущность IEvent представляет собой объек
         event.subscribe(mockEntitie)
         event.unsub("1")
         expect(event.subscribers.length).toBe(0)
+    })
+    test("event проходит по всем подписчикам и передаёт им объект data. Подписчики обрабатывают данные, реагируя на сигнал эвента", () => {
+        event.subscribe(mockSubscriber)
+        event.subscribe(mockSubscriber2)
+        let mockData = {
+            user: "Alex",
+            status: "Tester"
+        }
+        event.initiate<typeof mockData>(mockData)
+        expect(mockSubscriber.handle).toBeCalledTimes(1)
+        expect(mockSubscriber2.handle).toBeCalledTimes(1)
+        expect(mockSubscriber.handle(event.tag, mockData)).toBe("Alex declined")
     })
 })

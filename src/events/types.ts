@@ -4,6 +4,7 @@ export interface IEventSystem {
     initiate<DT>(tag: string, data: DT): void
     subscribe(tag: string, entitie: IWithEvents): IEventSystem
     unsub(tag: string, id: string): IEventSystem
+    del(tag: string): IEventSystem
 }
 
 export interface IEvent {
